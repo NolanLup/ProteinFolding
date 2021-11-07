@@ -1,9 +1,9 @@
 print("Set a DIO based on voltage. Digital I/O is FIO3 (FIO5 on T4), voltage measured on AIN1. Update at 10Hz")
 local TempA0Volt = 0
 local pHA1Volt = 0
-local TempThresh = .25
-local acidThresh = 3.40 -- KCL solution reads around 3.54 Volts
-local baseThresh = 2.65 -- Alkaline water reads around 2.60 Volts
+local TempThresh = 45.1 -- Temp Threshold
+local acidThresh = 7.00 -- KCL solution reads around 3.54 Volts
+local baseThresh = 4.00 -- Alkaline water reads around 2.60 Volts
 
 local mbRead=MB.R			--local functions for faster processing
 local mbWrite=MB.W
