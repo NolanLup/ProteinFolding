@@ -2,31 +2,33 @@ import sys
 from time import sleep
 
 from labjack import ljm
-
-from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QTextBrowser, QLCDNumber, QInputDialog, \
+from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QLCDNumber, \
     QDoubleSpinBox, QSpinBox
-from PyQt5 import uic, QtWidgets
+from PyQt5 import uic
 from PyQt5.QtCore import QTimer
 
-# Global Variables
+# Parameters
 seconds = 0
 pHParameter = 0
 orpParameter = 0
 tempParameter = 0
+agitationTime = 0
 
+# Current value of pH,ORP,Temp,DO
+pHCurrent = 0
+orpCurrent = 0
+tempCurrent = 0
+DOCurrent = 0
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+handle = ljm.openS("ANY", "ANY", "ANY")  # Any device, Any connection, Any identifier
 
-def loadLuaScript(handle, luaScript):
+def loadLuaScript(luaScript):
     """Function that loads and begins running a lua script
 
     """
     try:
-        scriptLen = len(luaScript)
+        scriptLen = len(luaScript) + 1
         # LUA_RUN must be written to twice to disable any running scripts.
-        print("Script length: %u\n" % scriptLen)
         ljm.eWriteName(handle, "LUA_RUN", 0)
         # Then, wait for the Lua VM to shut down. Some T7 firmware
         # versions need a longer time to shut down than others.
@@ -42,12 +44,6 @@ def loadLuaScript(handle, luaScript):
         raise
 
 
-def updateLabjack(luaScript):
-    # Open first found LabJack
-    handle = ljm.openS("ANY", "ANY", "ANY")  # Any device, Any connection, Any identifier
-    loadLuaScript(handle, luaScript)
-    ljm.close(handle)
-
 class UI(QMainWindow):
     def __init__(self):
         super(UI, self).__init__()
@@ -58,34 +54,43 @@ class UI(QMainWindow):
         # define LCD
         self.lcd = self.findChild(QLCDNumber, "timeSince")
 
+        # define current variables
+        self.pHValue = self.findChild(QLCDNumber, "pHValue")
+        self.ORPValue = self.findChild(QLCDNumber, "ORPValue")
+        self.tempValue = self.findChild(QLCDNumber, "tempValue")
+        self.DOValue = self.findChild(QLCDNumber, "DOValue")
+
         # define buttons
-        self.pumpCalibrate = self.findChild(QPushButton, "calibrate")
         self.start = self.findChild(QPushButton, "start")
         self.stop = self.findChild(QPushButton, "stop")
         self.exit = self.findChild(QPushButton, "exit")
-        self.pumpSterilize = self.findChild(QPushButton, "sterilize")
 
         # define input boxes
         self.pHinputBox = self.findChild(QDoubleSpinBox, "pH")
-        self.pHinputBox.setRange(0, 14)
+        self.pHinputBox.setRange(1, 14)
         self.orpinputBox = self.findChild(QSpinBox, "orp")
         self.orpinputBox.setRange(-1900, 1900)
         self.tempinputBox = self.findChild(QDoubleSpinBox, "temp")
         self.tempinputBox.setRange(0, 40)
+        self.agitationinputBox = self.findChild(QDoubleSpinBox, "agitation")
+        self.agitationinputBox.setRange(0, 5)  # In minutes
 
         # Setup timer and buttons
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.lcdUpdate)
+        self.timerUpdateGUI = QTimer()
+        self.timerUpdateGUI.timeout.connect(self.updateGUI)
         self.start.pressed.connect(self.startControl)
         self.stop.pressed.connect(self.stopControl)
         self.exit.pressed.connect(self.exitApp)
 
-
         # Show application window
         self.show()
 
-    def lcdUpdate(self):
+    def updateGUI(self):
         global seconds
+        global pHCurrent
+        global orpCurrent
+        global tempCurrent
+        global DOCurrent
 
         def convert(timeSeconds):
             timeSeconds = timeSeconds % (24 * 3600)
@@ -94,100 +99,109 @@ class UI(QMainWindow):
             minutes = timeSeconds // 60
             timeSeconds %= 60
 
-            return "%d:%02d:%02d" % (hour, minutes, timeSeconds)
+            return "%02d:%02d:%02d" % (hour, minutes, timeSeconds)
 
         # Update seconds by 1
         seconds += 1
-        # Get time
+        # Update time LCD
         self.lcd.setDigitCount(8)
         self.lcd.display(convert(seconds))
 
+        # Read values from sensors
+
+        pHCurrent = ((118.65 / 16) * ljm.eReadName(handle, 'AIN4')) - 3.5
+        orpCurrent = ((16102.5 / 8) * ljm.eReadName(handle, 'AIN5')) - 2850
+        DOCurrent = (((0.125 * 8.475) * ljm.eReadName(handle, 'AIN6')) - 0.5) * 100
+        tempCurrent = ((325 / 71) * ljm.eReadName(handle, 'AIN0')) - (3257 / 284)
+
+        # Update pH,ORP,Temp,DO
+        self.pHValue.display(pHCurrent)
+        self.ORPValue.display(orpCurrent)
+        self.tempValue.display(tempCurrent)
+        self.DOValue.display(DOCurrent)
+
     def startControl(self):
         global seconds
+        global pHParameter
+        global tempParameter
+        global orpParameter
+        global agitationTime
 
         def takeInputs():
             global pHParameter
             global tempParameter
             global orpParameter
+            global agitationTime
 
             pHParameter = self.pHinputBox.value()
             tempParameter = self.tempinputBox.value()
             orpParameter = self.orpinputBox.value()
+            agitationTime = 60000 * (self.agitationinputBox.value())
 
         seconds = 0
         takeInputs()
-        luaScript = """ local pHA0Volt = 0
-                            local orpA1Volt = 0
-                            local acidThresh = """ + str(pHParameter + 1) + """ -- KCL solution reads around 3.54 Volts
-                            local baseThresh = """ + str(pHParameter - 1) + """ -- Alkaline water reads around 2.60 Volts
-                            local agitationOn = 0 -- 0 if agitation system is off, 1 if agitation system is on
-
-                            local mbRead=MB.R			--local functions for faster processing
-                            local mbWrite=MB.W
-
-                            local baseOutPin = 2005 --FIO5
-                            local acidOutPin = 2006 --FIO6
-                            local agitationOutPin = 2007 --FI07
-
-                            LJ.IntervalConfig(0, 100)                   --set interval to 100 for 100ms
-                            local checkInterval=LJ.CheckInterval
-
-                            while true do
-                              if checkInterval(0) then              --interval completed
-                                pHA0Volt = ((59.325*mbRead(0,3))-28)/8   -- Read AN1
-                                orpA1Volt = ((16102.5*mbRead(2,3))-22800)/8
-                                -- Check pH Volt
-                                if pHA0Volt > acidThresh then --if pH is greater than acid threshold
-                                  mbWrite(baseOutPin, 0, 0)
-                                  LJ.IntervalConfig(2, 1000) -- Set acidInterval for 1 seconds
-                                  while not checkInterval(2) do 
-                                    mbWrite(acidOutPin, 0, 1)   -- Turn on acid pump for 3 seconds
-                                  end
-                                  mbWrite(acidOutPin, 0, 0) -- Turn off acid pump
-                                  agitationOn = 1 
-                                elseif pHA0Volt < baseThresh and pHA0Volt > 0 then -- if pH is less than base threshold
-                                  mbWrite(acidOutPin, 0, 0)
-                                  LJ.IntervalConfig(2, 1000) -- Set baseInterval for 1 seconds
-                                  while not checkInterval(2) do 
-                                    mbWrite(baseOutPin, 0, 1)   -- Turn on base pump for 3 seconds
-                                  end
-                                  mbWrite(baseOutPin, 0, 0) -- Turn off base pump
-                                  agitationOn = 1 
-                                else
-                                  mbWrite(baseOutPin, 0, 0) -- Turn of base pump
-                                  mbWrite(acidOutPin, 0, 0) -- Turn of acid pump
-                                  mbWrite(agitationOutPin, 0, 0) -- Turn of agitation
-                                end
-                                if (agitationOn == 1) then
-                                    LJ.IntervalConfig(1, 5000)                 --Set agitationInterval for 5 seconds
-                                    while not checkInterval(1) do
-                                      mbWrite(agitationOutPin, 0, 1)
-                                    end
-                                      mbWrite(agitationOutPin, 0, 0)
-                                      agitationOn = 0
-                                  end
-                              end
-                            end"""
-        updateLabjack(luaScript)
-        self.timer.start(1000)
+        acidthreshold = pHParameter + 1
+        basethreshold = pHParameter - 1
+        orpThreshold = orpParameter
+        tempThreshold = tempParameter
+        luaScript = """
+local mbRead=MB.R
+local mbWrite=MB.W
+pH=0
+ORP=0
+DO=0
+Temp=0
+baseThreshold=""" + str(basethreshold) + """
+acidThreshold=""" + str(acidthreshold) + """
+targetORP=""" + str(orpThreshold) + """
+targetTemp= """ + str(tempThreshold) + """
+LJ.IntervalConfig(0, 1000)    
+local checkInterval=LJ.CheckInterval
+function sleep(time_ms)
+    LJ.IntervalConfig(7, time_ms)  
+    while( LJ.CheckInterval(7) ~= 1 )do
+    end
+end
+sdaPin=15
+sclPin=11
+throttleVal=65526
+baseAddr=0x1
+acidAddr=0x2
+reducingAgentAddr=0x3
+while true do
+  if checkInterval(0) then
+    pH=((118.65/16)*mbRead(8, 3)) - 3.5--Read address 0 (AIN0), type is 3
+    ORP=((16102.5/8)*mbRead(10, 3)) - 2850--Read address 0 (AIN0), type is 3
+    DO=(((0.125*8.475)*mbRead(12, 3)) - 0.5) * 100
+    Temp=((325/71)*mbRead(0, 3)) - (3257/284)
+    if pH < baseThreshold then
+      I2C.config(sdaPin, sclPin, throttleVal, 0, acidAddr)
+      I2C.write({0x44,0x2C,0x31,0x35})
+      sleep(10000)
+    elseif pH > acidThreshold then
+      I2C.config(sdaPin, sclPin, throttleVal, 0, baseAddr)
+      I2C.write({0x44,0x2C,0x31,0x35})
+      sleep(10000)
+    elseif ORP > targetORP then
+      I2C.config(sdaPin, sclPin, throttleVal, 0, reducingAgentAddr)
+      I2C.write({0x44,0x2C,0x31,0x35})
+      sleep(10000)
+    end
+  end
+end"""
+        loadLuaScript(luaScript)
+        self.timerUpdateGUI.start(1000)
 
     def stopControl(self):
         global seconds
-        luaScript = """local mbRead=MB.R --local functions for faster processing
-                    local mbWrite=MB.W
 
-                    local baseOutPin = 2005 --FIO5
-                    local acidOutPin = 2006 --FIO6
-                    local agitationOutPin = 2007 --FI07
-                    mbWrite(baseOutPin, 0, 0) -- Turn of base pump
-                    mbWrite(acidOutPin, 0, 0) -- Turn of acid pump
-                    mbWrite(agitationOutPin, 0, 0) -- Turn of agitation"""
-        updateLabjack(luaScript)
-        seconds = 0
-        self.timer.stop()
+        luaScript = ""
+        loadLuaScript(luaScript)
+        self.timerUpdateGUI.stop()
 
     def exitApp(self):
         app.exit()
+        ljm.close(handle)
 
 
 if __name__ == '__main__':
