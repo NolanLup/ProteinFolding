@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>987</width>
-    <height>756</height>
+    <width>1935</width>
+    <height>1033</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,8 +20,8 @@
    <widget class="QPushButton" name="start">
     <property name="geometry">
      <rect>
-      <x>380</x>
-      <y>330</y>
+      <x>310</x>
+      <y>120</y>
       <width>161</width>
       <height>41</height>
      </rect>
@@ -46,8 +46,8 @@ border-color: rgb(0, 0, 0);</string>
    <widget class="QPushButton" name="exit">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>390</y>
+      <x>440</x>
+      <y>180</y>
       <width>81</width>
       <height>31</height>
      </rect>
@@ -69,8 +69,8 @@ background-color: rgb(85, 85, 175);</string>
    <widget class="QPushButton" name="stop">
     <property name="geometry">
      <rect>
-      <x>570</x>
-      <y>330</y>
+      <x>490</x>
+      <y>120</y>
       <width>151</width>
       <height>41</height>
      </rect>
@@ -88,33 +88,12 @@ background-color: rgb(85, 85, 175);</string>
      <string>Stop Control</string>
     </property>
    </widget>
-   <widget class="QTextBrowser" name="textBrowser">
-    <property name="geometry">
-     <rect>
-      <x>370</x>
-      <y>20</y>
-      <width>491</width>
-      <height>241</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">color: rgb(0, 0, 0);
-background-color: rgb(255, 255, 255);</string>
-    </property>
-    <property name="html">
-     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-   </widget>
    <widget class="QLCDNumber" name="timeSince">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>260</y>
-      <width>201</width>
+      <x>220</x>
+      <y>380</y>
+      <width>351</width>
       <height>111</height>
      </rect>
     </property>
@@ -125,8 +104,8 @@ p, li { white-space: pre-wrap; }
    <widget class="QLabel" name="clockLabel">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>220</y>
+      <x>290</x>
+      <y>320</y>
       <width>251</width>
       <height>31</height>
      </rect>
@@ -147,8 +126,8 @@ color: rgb(255, 255, 255);</string>
    <widget class="QDoubleSpinBox" name="pH">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>430</y>
+      <x>200</x>
+      <y>560</y>
       <width>111</width>
       <height>41</height>
      </rect>
@@ -162,8 +141,8 @@ background-color: rgb(255, 255, 255);</string>
    <widget class="QSpinBox" name="orp">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>500</y>
+      <x>200</x>
+      <y>630</y>
       <width>111</width>
       <height>41</height>
      </rect>
@@ -177,8 +156,8 @@ background-color: rgb(255, 255, 255);</string>
    <widget class="QDoubleSpinBox" name="temp">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>570</y>
+      <x>200</x>
+      <y>700</y>
       <width>111</width>
       <height>41</height>
      </rect>
@@ -192,8 +171,8 @@ background-color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="pHLabel">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>440</y>
+      <x>320</x>
+      <y>570</y>
       <width>201</width>
       <height>31</height>
      </rect>
@@ -218,8 +197,8 @@ color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="orpLabel">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>510</y>
+      <x>320</x>
+      <y>640</y>
       <width>261</width>
       <height>31</height>
      </rect>
@@ -244,8 +223,8 @@ color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>580</y>
+      <x>320</x>
+      <y>710</y>
       <width>201</width>
       <height>31</height>
      </rect>
@@ -270,8 +249,8 @@ color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="label_4">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>650</y>
+      <x>320</x>
+      <y>780</y>
       <width>251</width>
       <height>31</height>
      </rect>
@@ -296,8 +275,8 @@ color: rgb(255, 255, 255);</string>
    <widget class="QDoubleSpinBox" name="agitation">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>640</y>
+      <x>200</x>
+      <y>770</y>
       <width>111</width>
       <height>41</height>
      </rect>
@@ -311,8 +290,8 @@ background-color: rgb(255, 255, 255);</string>
    <widget class="QLCDNumber" name="pHValue">
     <property name="geometry">
      <rect>
-      <x>820</x>
-      <y>320</y>
+      <x>850</x>
+      <y>80</y>
       <width>101</width>
       <height>51</height>
      </rect>
@@ -335,8 +314,8 @@ background-color: rgb(255, 255, 255);</string>
    <widget class="QLCDNumber" name="ORPValue">
     <property name="geometry">
      <rect>
-      <x>820</x>
-      <y>420</y>
+      <x>850</x>
+      <y>320</y>
       <width>101</width>
       <height>51</height>
      </rect>
@@ -359,8 +338,8 @@ background-color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="pHLabel_2">
     <property name="geometry">
      <rect>
-      <x>810</x>
-      <y>290</y>
+      <x>840</x>
+      <y>50</y>
       <width>121</width>
       <height>31</height>
      </rect>
@@ -385,8 +364,8 @@ color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="pHLabel_3">
     <property name="geometry">
      <rect>
-      <x>810</x>
-      <y>390</y>
+      <x>840</x>
+      <y>290</y>
       <width>121</width>
       <height>31</height>
      </rect>
@@ -411,8 +390,8 @@ color: rgb(255, 255, 255);</string>
    <widget class="QLCDNumber" name="tempValue">
     <property name="geometry">
      <rect>
-      <x>820</x>
-      <y>520</y>
+      <x>850</x>
+      <y>560</y>
       <width>101</width>
       <height>51</height>
      </rect>
@@ -435,8 +414,8 @@ color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="pHLabel_4">
     <property name="geometry">
      <rect>
-      <x>810</x>
-      <y>490</y>
+      <x>830</x>
+      <y>530</y>
       <width>131</width>
       <height>31</height>
      </rect>
@@ -461,8 +440,8 @@ color: rgb(255, 255, 255);</string>
    <widget class="QLCDNumber" name="DOValue">
     <property name="geometry">
      <rect>
-      <x>820</x>
-      <y>620</y>
+      <x>850</x>
+      <y>800</y>
       <width>101</width>
       <height>51</height>
      </rect>
@@ -485,8 +464,8 @@ color: rgb(255, 255, 255);</string>
    <widget class="QLabel" name="pHLabel_5">
     <property name="geometry">
      <rect>
-      <x>810</x>
-      <y>590</y>
+      <x>840</x>
+      <y>770</y>
       <width>121</width>
       <height>31</height>
      </rect>
@@ -508,19 +487,67 @@ color: rgb(255, 255, 255);</string>
      <string>  Current DO</string>
     </property>
    </widget>
+   <widget class="PlotWidget" name="graphWidget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>980</x>
+      <y>20</y>
+      <width>921</width>
+      <height>231</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="PlotWidget" name="graphWidget_2" native="true">
+    <property name="geometry">
+     <rect>
+      <x>980</x>
+      <y>260</y>
+      <width>921</width>
+      <height>231</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="PlotWidget" name="graphWidget_3" native="true">
+    <property name="geometry">
+     <rect>
+      <x>980</x>
+      <y>500</y>
+      <width>921</width>
+      <height>231</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="PlotWidget" name="graphWidget_4" native="true">
+    <property name="geometry">
+     <rect>
+      <x>980</x>
+      <y>740</y>
+      <width>921</width>
+      <height>231</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>987</width>
+     <width>1935</width>
      <height>26</height>
     </rect>
    </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PlotWidget</class>
+   <extends>QWidget</extends>
+   <header>pyqtgraph</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
